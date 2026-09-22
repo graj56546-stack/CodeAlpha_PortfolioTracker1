@@ -1,218 +1,115 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[codz]
-*$py.class
+STOCK_PRICES = {
+    "AAPL": 180,
+    "TSLA": 250,
+    "GOOGL": 140,
+    "AMZN": 145,
+    "MSFT": 410,
+    "NFLX": 670,
+    "META": 500,
+}
 
-# C extensions
-*.so
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+def show_available_stocks():
+    print("\nAvailable Stocks and Prices (USD):")
+    print("-" * 35)
+    for symbol, price in STOCK_PRICES.items():
+        print(f"{symbol:<8}${price}")
+    print("-" * 35)
 
-# PyInstaller
-#   Usually these files are written by a python script from a template
-#   before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+def get_user_portfolio():
+    """Ask the user for stock symbols and quantities, return a dict."""
+    portfolio = {}
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py.cover
-.hypothesis/
-.pytest_cache/
-cover/
+    print("\nEnter stock symbol and quantity (type 'done' to finish).")
 
-# Translations
-*.mo
-*.pot
+    while True:
+        symbol = input("\nStock symbol (or 'done'): ").strip().upper()
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+        if symbol == "DONE":
+            break
 
-# Flask stuff:
-instance/
-.webassets-cache
+        if symbol not in STOCK_PRICES:
+            print(f"'{symbol}' not found in our price list. Please try again.")
+            continue
 
-# Scrapy stuff:
-.scrapy
+        qty_input = input(f"Quantity of {symbol}: ").strip()
 
-# Sphinx documentation
-docs/_build/
+        if not qty_input.isdigit() or int(qty_input) <= 0:
+            print("Please enter a valid positive whole number for quantity.")
+            continue
 
-# PyBuilder
-.pybuilder/
-target/
+        quantity = int(qty_input)
 
-# Jupyter Notebook
-.ipynb_checkpoints
+        # If the stock is already in the portfolio, add to the existing quantity
+        portfolio[symbol] = portfolio.get(symbol, 0) + quantity
+        print(f"Added {quantity} share(s) of {symbol}.")
 
-# IPython
-profile_default/
-ipython_config.py
+    return portfolio
 
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
 
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-# Pipfile.lock
+def calculate_investment(portfolio):
+    """Return a list of (symbol, quantity, price, value) and the total."""
+    breakdown = []
+    total = 0
 
-# UV
-#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-# uv.lock
+    for symbol, quantity in portfolio.items():
+        price = STOCK_PRICES[symbol]
+        value = price * quantity
+        breakdown.append((symbol, quantity, price, value))
+        total += value
 
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-# poetry.lock
-# poetry.toml
+    return breakdown, total
 
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#   pdm recommends including project-wide configuration in pdm.toml, but excluding .pdm-python.
-#   https://pdm-project.org/en/latest/usage/project/#working-with-version-control
-# pdm.lock
-# pdm.toml
-.pdm-python
-.pdm-build/
 
-# pixi
-#   Similar to Pipfile.lock, it is generally recommended to include pixi.lock in version control.
-# pixi.lock
-#   Pixi creates a virtual environment in the .pixi directory, just like venv module creates one
-#   in the .venv directory. It is recommended not to include this directory in version control.
-.pixi
+def display_summary(breakdown, total):
+    print("\n" + "=" * 45)
+    print("PORTFOLIO SUMMARY")
+    print("=" * 45)
+    print(f"{'Stock':<8}{'Qty':<6}{'Price':<10}{'Value':<10}")
+    print("-" * 45)
 
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
+    for symbol, quantity, price, value in breakdown:
+        print(f"{symbol:<8}{quantity:<6}${price:<9}${value}")
 
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
+    print("-" * 45)
+    print(f"TOTAL INVESTMENT: ${total}")
+    print("=" * 45)
 
-# Redis
-*.rdb
-*.aof
-*.pid
 
-# RabbitMQ
-mnesia/
-rabbitmq/
-rabbitmq-data/
+def save_to_file(breakdown, total, filename="portfolio_summary.txt"):
+    with open(filename, "w") as f:
+        f.write("STOCK PORTFOLIO SUMMARY\n")
+        f.write("=" * 45 + "\n")
+        f.write(f"{'Stock':<8}{'Qty':<6}{'Price':<10}{'Value':<10}\n")
+        f.write("-" * 45 + "\n")
 
-# ActiveMQ
-activemq-data/
+        for symbol, quantity, price, value in breakdown:
+            f.write(f"{symbol:<8}{quantity:<6}${price:<9}${value}\n")
 
-# SageMath parsed files
-*.sage.py
+        f.write("-" * 45 + "\n")
+        f.write(f"TOTAL INVESTMENT: ${total}\n")
 
-# Environments
-.env
-.envrc
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+    print(f"\nSummary saved to '{filename}'")
 
-# Spyder project settings
-.spyderproject
-.spyproject
 
-# Rope project settings
-.ropeproject
+def main():
+    print("Welcome to the Stock Portfolio Tracker!")
+    show_available_stocks()
 
-# mkdocs documentation
-/site
+    portfolio = get_user_portfolio()
 
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
+    if not portfolio:
+        print("\nNo stocks were added. Exiting.")
+        return
 
-# Pyre type checker
-.pyre/
+    breakdown, total = calculate_investment(portfolio)
+    display_summary(breakdown, total)
 
-# pytype static type analyzer
-.pytype/
+    choice = input("\nSave summary to a file? (y/n): ").strip().lower()
+    if choice == "y":
+        save_to_file(breakdown, total)
 
-# Cython debug symbols
-cython_debug/
 
-# PyCharm
-#   JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#   be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#   and can be added to the global gitignore or merged into this file.  For a more nuclear
-#   option (not recommended) you can uncomment the following to ignore the entire idea folder.
-# .idea/
-
-# Abstra
-#   Abstra is an AI-powered process automation framework.
-#   Ignore directories containing user credentials, local state, and settings.
-#   Learn more at https://abstra.io/docs
-.abstra/
-
-# Visual Studio Code
-#   Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
-#   that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#   and can be added to the global gitignore or merged into this file. However, if you prefer, 
-#   you could uncomment the following to ignore the entire vscode folder
-# .vscode/
-# Temporary file for partial code execution
-tempCodeRunnerFile.py
-
-# Ruff stuff:
-.ruff_cache/
-
-# PyPI configuration file
-.pypirc
-
-# Marimo
-marimo/_static/
-marimo/_lsp/
-__marimo__/
-
-# Streamlit
-.streamlit/secrets.toml
+if __name__ == "__main__":
+    main()
